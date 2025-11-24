@@ -24,7 +24,7 @@ class VectorList {
         fin.seekg(0, std::ios::beg);
         size_t items = file_size / sizeof(float);
         auto buffer = std::make_unique<float[]>(items);
-        pointer_read(fin, buffer.get(), items);
+        fin.read(reinterpret_cast<char*>(buffer.get()), items * sizeof(float));
         if (!fin.good()) {
             return false;
         }
