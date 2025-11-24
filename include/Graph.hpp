@@ -4,7 +4,6 @@
 
 class Graph {
    public:
-   private:
     struct Node {
         struct Edge {
             unsigned to;
@@ -27,8 +26,20 @@ class Graph {
                 alpha[id] = std::max(alpha[id], fr);
             }
             bool empty() const { return alpha.empty(); }
+            bool valid(float alpha) const {
+                size_t id = std::lower_bound(this->alpha.begin(),
+                                             this->alpha.end(), alpha) -
+                            this->alpha.begin();
+                if (id % 2 == 1 ||
+                    (id < this->alpha.size() && this->alpha[id] == alpha)) {
+                    return true;
+                }
+                return false;
+            }
         };
         std::vector<Edge> edges;
     };
+
+   private:
     std::vector<Node> nodes;
 };
