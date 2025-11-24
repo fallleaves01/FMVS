@@ -1,6 +1,7 @@
 #pragma once
 #include <Eigen/Dense>
 #include <FIO.hpp>
+#include <iostream>
 #include <vector>
 
 class VectorList {
@@ -8,17 +9,24 @@ class VectorList {
     VectorList() = default;
     VectorList(std::string filename) {
         std::ifstream fin(filename);
-        load(fin);
+        if (!load(fin)) {
+            std::cerr << "Failed to load vectors from file: " << filename
+                      << std::endl;
+            exit(-1);
+        }
     }
     VectorList(std::istream& fin) { load(fin); }
 
-    void load(std::istream& fin) {
+    bool load(std::istream& fin) {
         fin.seekg(0, std::ios::end);
         size_t file_size = fin.tellg();
         fin.seekg(0, std::ios::beg);
         size_t items = file_size / sizeof(float);
         auto buffer = std::make_unique<float[]>(items);
         pointer_read(fin, buffer.get(), items);
+        if (!fin.good()) {
+            return false;
+        }
         size_t dim = reinterpret_cast<unsigned*>(buffer.get())[0];
         size_t n = items / (dim + 1);
         data.resize(n, Eigen::VectorXf(dim));
