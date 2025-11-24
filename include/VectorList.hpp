@@ -1,4 +1,5 @@
 #pragma once
+#include <spdlog/spdlog.h>
 #include <Eigen/Dense>
 #include <FIO.hpp>
 #include <iostream>
@@ -29,13 +30,16 @@ class VectorList {
         }
         size_t dim = reinterpret_cast<unsigned*>(buffer.get())[0];
         size_t n = items / (dim + 1);
+        spdlog::info("Vector dimension: {}", dim);
+        spdlog::info("Number of vectors: {}", n);
         data.resize(n, Eigen::VectorXf(dim));
         sqr.resize(n);
         for (size_t i = 0; i < n; ++i) {
-            std::copy(buffer.get() + 1 + i * (dim + 1),
-                      buffer.get() + 1 + (i + 1) * (dim + 1), data[i].data());
+            std::copy(buffer.get() + i * (dim + 1) + 1,
+                      buffer.get() + (i + 1) * (dim + 1), data[i].data());
             sqr[i] = data[i].squaredNorm();
         }
+        return true;
     }
 
     template <typename T>
@@ -60,6 +64,21 @@ class VectorList {
                 dists[k] = dist2(i, j[k]);
             }
         }
+    }
+
+    VectorList clone(size_t l = 0, size_t r = -1) const {
+        VectorList res;
+        l = std::min(l, data.size());
+        r = std::min(r, data.size());
+        res.data.resize(r - l);
+        res.sqr.resize(r - l);
+        for (int i = l; i < r; i++) {
+            res.data[i - l] = data[i];
+            res.sqr[i - l] = sqr[i];
+        }
+        spdlog::info("Cloned VectorList from {} to {}, size {}", l, r,
+                     res.data.size());
+        return res;
     }
 
    private:
