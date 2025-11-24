@@ -126,19 +126,19 @@ find_package(OpenMP REQUIRED)
 # 1. 搜集 include 目录下的所有头文件
 file(GLOB_RECURSE HEADER_FILES "include/*.hpp" "include/*.h")
 
-add_executable(fmvs
-  src/main.cpp
+add_executable(fmvs_build
+  src/build.cpp
   ${HEADER_FILES}  # 2. 将头文件加入源列表，专门为了让 IDE 识别上下文
 )
 
-target_include_directories(fmvs
+target_include_directories(fmvs_build
   PRIVATE
     ${CMAKE_SOURCE_DIR}/include
 )
 
-set_property(TARGET fmvs PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+set_property(TARGET fmvs_build PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 
-target_link_libraries(fmvs
+target_link_libraries(fmvs_build
   PRIVATE
     spdlog::spdlog
     Eigen3::Eigen
