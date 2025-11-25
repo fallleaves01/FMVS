@@ -126,26 +126,52 @@ find_package(OpenMP REQUIRED)
 # 1. 搜集 include 目录下的所有头文件
 file(GLOB_RECURSE HEADER_FILES "include/*.hpp" "include/*.h")
 
+# ========================================================
+#  定义公共配置 (Interface Library)
+# ========================================================
+add_library(fmvs_common_config INTERFACE)
+
+# 1. 公共包含目录
+target_include_directories(fmvs_common_config INTERFACE
+  ${CMAKE_SOURCE_DIR}/include
+)
+
+# 2. 公共链接库
+target_link_libraries(fmvs_common_config INTERFACE
+  spdlog::spdlog
+  Eigen3::Eigen
+  nlohmann_json::nlohmann_json
+  phmap::phmap
+  OpenMP::OpenMP_CXX
+  mimalloc-static
+  # BLAS::BLAS
+)
+
+# ========================================================
+#  定义可执行文件
+# ========================================================
+
 add_executable(fmvs_build
   src/build.cpp
   src/build_fmvs_graph.cpp
-  ${HEADER_FILES}  # 2. 将头文件加入源列表，专门为了让 IDE 识别上下文
+  ${HEADER_FILES}
 )
 
-target_include_directories(fmvs_build
-  PRIVATE
-    ${CMAKE_SOURCE_DIR}/include
+add_executable(fmvs_query
+  src/query.cpp
+  src/fmvs_beam_search.cpp
+  ${HEADER_FILES}
 )
 
-set_property(TARGET fmvs_build PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+# ========================================================
+#  统一应用配置
+# ========================================================
 
-target_link_libraries(fmvs_build
-  PRIVATE
-    spdlog::spdlog
-    Eigen3::Eigen
-    nlohmann_json::nlohmann_json
-    phmap::phmap
-    OpenMP::OpenMP_CXX
-    mimalloc-static
-    # BLAS::BLAS   # 如果上面 find_package(BLAS REQUIRED) 了可以加上
-)
+# 使用循环为所有目标应用配置和属性
+foreach(TARGET_NAME fmvs_build fmvs_query)
+  # 链接公共配置
+  target_link_libraries(${TARGET_NAME} PRIVATE fmvs_common_config)
+  
+  # 开启 LTO/IPO
+  set_property(TARGET ${TARGET_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+endforeach()
