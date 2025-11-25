@@ -14,6 +14,9 @@ class Graph {
             Edge(unsigned t) : to(t), alpha{std::pair{0.0f, 1.0f}} {}
 
             void remove(float fl, float fr) {
+                if (fl >= fr) {
+                    return;
+                }
                 auto it = std::ranges::lower_bound(alpha, std::pair{fl, -1.0f});
                 if (it != alpha.begin() && prev(it)->second > fl) {
                     it--;
