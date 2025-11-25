@@ -1,6 +1,7 @@
 #include <FIO.hpp>
 #include <Utils.hpp>
 #include <VectorList.hpp>
+#include <fmvs_algorithms.hpp>
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -24,5 +25,13 @@ int main() {
     spdlog::info("ef_spatial: {}", ef_spatial);
     spdlog::info("ef_attribute: {}", ef_attribute);
     spdlog::info("max_edges: {}", max_edges);
+
+    VectorList total(vector_file);
+    VectorList base = total.clone(0, 1000);
+    VectorList addition = total.clone(1000, 2000);
+
+    std::ofstream fout(output_file, std::ios::binary);
+    build_fmvs_graph(base, addition, ef_spatial, ef_attribute, max_edges)
+        .save(fout);
     return 0;
 }

@@ -1,5 +1,7 @@
+#include <phmap.h>
 #include <Utils.hpp>
 #include <fmvs_algorithms.hpp>
+#include <ranges>
 
 namespace BuildFMVS {
 using namespace NodeUtils;
@@ -27,14 +29,14 @@ void prune(size_t i,
            const VectorList& data_e,
            const VectorList& data_s,
            const std::vector<Node>& cand,
-           size_t max_edges) {
-    std::vector<std::pair<size_t, size_t>> ins;
+           size_t max_edges,
+           std::vector<std::pair<Node, size_t>>& ins) {
+    size_t cnt = 0;
     for (size_t j = 0; j < cand.size(); j++) {
         const auto& u = cand[j];
         size_t iu = index(u);
         Graph::Node::Edge e(iu);
-        for (auto& [i_cand, i_edge] : ins) {
-            auto& v = cand[i_cand];
+        for (auto& [v, i_edge] : ins) {
             size_t iv = index(v);
             const auto& diu = pos(u);
             const auto& div = pos(v);
@@ -45,9 +47,12 @@ void prune(size_t i,
                 auto nr = merge(r, v_r);
                 e.remove(nr.first, nr.second);
             }
-            if (!e.empty()) {
-                ins.emplace_back(j, edges.size());
-                edges.push_back(e);
+        }
+        if (!e.empty()) {
+            ins.emplace_back(u, edges.size());
+            edges.push_back(e);
+            if (++cnt > max_edges) {
+                return;
             }
         }
     }
@@ -56,7 +61,6 @@ void prune(size_t i,
 
 Graph build_fmvs_graph(const VectorList& data_e,
                        const VectorList& data_s,
-                       std::vector<size_t> attribute,
                        size_t ef_spatial,
                        size_t ef_attribute,
                        size_t max_edges) {
@@ -68,6 +72,7 @@ Graph build_fmvs_graph(const VectorList& data_e,
         "Building FMVS graph with ef_spatial={}, ef_attribute={}, max_edges={}",
         ef_spatial, ef_attribute, max_edges);
 
+    std::vector<std::vector<std::pair<Node, size_t>>> ins_l(n), ins_r(n);
     for (size_t i = 0; i < n; i++) {
         std::vector<Node> cand_l, cand_r;
         for (size_t j = i - std::min(i, ef_attribute / 2); j < i; j++) {
@@ -78,6 +83,34 @@ Graph build_fmvs_graph(const VectorList& data_e,
             cand_r.push_back(Node{j, {data_e.dist2(i, j), data_s.dist2(i, j)}});
         }
         auto& edge = g.get_edges(i);
+        prune(i, edge, data_e, data_s, cand_l, max_edges / 2, ins_l[i]);
+        prune(i, edge, data_e, data_s, cand_r, max_edges / 2, ins_r[i]);
+        if (i % 100 == 0) {
+            spdlog::info("{}/{} of attribute building done, degree = {}", i + 1,
+                         n, edge.size());
+        }
+    }
+    for (size_t i = 0; i < n; i++) {
+        auto cand =
+            pareto_search(g, i, data_e, data_s, std::vector{i}, ef_spatial);
+        std::vector<Node> cand_l, cand_r;
+        for (auto& node : cand) {
+            if (index(node) < i) {
+                cand_l.push_back(node);
+            } else if (index(node) > i) {
+                cand_r.push_back(node);
+            }
+        }
+        std::ranges::sort(cand_l, std::ranges::less{}, &Node::first);
+        std::ranges::sort(cand_r, std::ranges::greater{}, &Node::first);
+        auto& edge = g.get_edges(i);
+        prune(i, edge, data_e, data_s, cand_l, max_edges / 2, ins_l[i]);
+        prune(i, edge, data_e, data_s, cand_r, max_edges / 2, ins_r[i]);
+        if (i % 100 == 0) {
+            spdlog::info(
+                "{}/{} of spatial building done, candiadtes = {}, degree = {}",
+                i + 1, n, cand.size(), edge.size());
+        }
     }
     return g;
 }
