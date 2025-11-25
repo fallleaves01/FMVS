@@ -43,7 +43,7 @@ class VectorList {
     }
 
     template <typename T>
-    float dist2(size_t i, const T& j) {
+    float dist2(size_t i, const T& j) const {
         if constexpr (std::is_convertible_v<T, size_t>) {
             return sqr[i] + sqr[j] - 2 * data[i].dot(data[j]);
         } else {
@@ -52,7 +52,7 @@ class VectorList {
     }
 
     template <typename U, typename V>
-    void dist2_all(const U& i, const V* j, size_t n, float* dists) {
+    void dist2_all(const U& i, const V* j, size_t n, float* dists) const {
         if constexpr (!std::is_convertible_v<U, size_t> &&
                       std::is_convertible_v<V, size_t>) {
             float sqr_i = i.squaredNorm();
@@ -80,6 +80,8 @@ class VectorList {
                      res.data.size());
         return res;
     }
+
+    const size_t size() const { return data.size(); }
 
    private:
     std::vector<Eigen::VectorXf> data;
