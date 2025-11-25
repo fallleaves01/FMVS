@@ -40,23 +40,23 @@ namespace NodeUtils {
 using Node = std::pair<size_t, std::array<float, 2>>;
 using Pos = std::array<float, 2>;
 
-size_t& index(Node& node) {
+inline size_t& index(Node& node) {
     return node.first;
 }
 
-const size_t& index(const Node& node) {
+inline const size_t& index(const Node& node) {
     return node.first;
 }
 
-Pos& pos(Node& node) {
+inline Pos& pos(Node& node) {
     return node.second;
 }
 
-const Pos& pos(const Node& node) {
+inline const Pos& pos(const Node& node) {
     return node.second;
 }
 
-bool convex(const Pos& a, const Pos& b, const Pos& c) {
+inline bool convex(const Pos& a, const Pos& b, const Pos& c) {
     return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]) > 0;
 }
 }  // namespace NodeUtils

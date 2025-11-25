@@ -87,7 +87,11 @@ class Graph {
     Graph(size_t n) : nodes(n) {}
 
     Node& operator[](size_t id) { return nodes[id]; }
+    const Node& operator[](size_t id) const { return nodes[id]; }
     std::vector<Node::Edge>& get_edges(size_t id) { return nodes[id].edges; }
+    const std::vector<Node::Edge>& get_edges(size_t id) const {
+        return nodes[id].edges;
+    }
 
     bool save(std::ostream& out) const {
         if (!item_vector_write(out, nodes)) {
