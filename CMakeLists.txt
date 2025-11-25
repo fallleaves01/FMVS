@@ -3,7 +3,7 @@ project(my_project CXX)
 
 # ---------------- 基本配置 ----------------
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 默认构建类型：Release（如果你没手动指定的话）
@@ -128,6 +128,8 @@ file(GLOB_RECURSE HEADER_FILES "include/*.hpp" "include/*.h")
 
 add_executable(fmvs_build
   src/build.cpp
+  src/build_fmvs_graph.cpp
+  src/pareto_search.cpp
   ${HEADER_FILES}  # 2. 将头文件加入源列表，专门为了让 IDE 识别上下文
 )
 
