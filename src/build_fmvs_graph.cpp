@@ -41,7 +41,7 @@ void prune(size_t i,
             const auto& diu = pos(u);
             const auto& div = pos(v);
             const auto& duv =
-                std::array{data_e.dist2(iu, iv), data_s.dist2(iu, iv)};
+                std::array{data_e.dist(iu, iv), data_s.dist(iu, iv)};
             auto r = merge(alpha_less(div, diu), alpha_less(duv, diu));
             for (auto v_r : edges[i_edge].alpha) {
                 auto nr = merge(r, v_r);
@@ -76,11 +76,11 @@ Graph build_fmvs_graph(const VectorList& data_e,
     for (size_t i = 0; i < n; i++) {
         std::vector<Node> cand_l, cand_r;
         for (size_t j = i - std::min(i, ef_attribute / 2); j < i; j++) {
-            cand_l.push_back(Node{j, {data_e.dist2(i, j), data_s.dist2(i, j)}});
+            cand_l.push_back(Node{j, {data_e.dist(i, j), data_s.dist(i, j)}});
         }
         std::ranges::reverse(cand_l);
         for (size_t j = i + 1; j < std::min(n, i + ef_attribute / 2 + 1); j++) {
-            cand_r.push_back(Node{j, {data_e.dist2(i, j), data_s.dist2(i, j)}});
+            cand_r.push_back(Node{j, {data_e.dist(i, j), data_s.dist(i, j)}});
         }
         auto& edge = g.get_edges(i);
         prune(i, edge, data_e, data_s, cand_l, max_edges / 2, ins_l[i]);

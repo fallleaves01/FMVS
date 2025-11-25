@@ -51,6 +51,11 @@ class VectorList {
         }
     }
 
+    template <typename T>
+    float dist(size_t i, const T& j) const {
+        return std::sqrt(dist2(i, j));
+    }
+
     template <typename U, typename V>
     void dist2_all(const U& i, const V* j, size_t n, float* dists) const {
         if constexpr (!std::is_convertible_v<U, size_t> &&

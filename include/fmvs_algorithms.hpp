@@ -51,8 +51,8 @@ std::vector<NodeUtils::Node> pareto_search(
     phmap::flat_hash_set<size_t> visited, updated;
     std::vector<Node> result;
     for (auto i : start_nodes) {
-        float dist_e = data_e.dist2(i, q);
-        float dist_s = data_s.dist2(i, q);
+        float dist_e = data_e.dist(i, q);
+        float dist_s = data_s.dist(i, q);
         result.emplace_back(Node{i, {dist_e, dist_s}});
         visited.insert(i);
     }
@@ -66,8 +66,8 @@ std::vector<NodeUtils::Node> pareto_search(
                     if (visited.contains(to)) {
                         continue;
                     }
-                    float dist_e = data_e.dist2(to, q);
-                    float dist_s = data_s.dist2(to, q);
+                    float dist_e = data_e.dist(to, q);
+                    float dist_s = data_s.dist(to, q);
                     ins.emplace_back(Node{to, {dist_e, dist_s}});
                     visited.insert(to);
                 }
@@ -81,3 +81,12 @@ std::vector<NodeUtils::Node> pareto_search(
     }
     return result;
 }
+
+std::vector<size_t> beam_search(const Graph& g,
+                                const Eigen::VectorXf& q,
+                                const VectorList& data_e,
+                                const VectorList& data_s,
+                                size_t k,
+                                float alpha,
+                                size_t start_node,
+                                size_t beam_size);
