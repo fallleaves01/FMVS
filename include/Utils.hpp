@@ -1,10 +1,9 @@
 #pragma once
-#include <spdlog/spdlog.h>
-#include <filesystem>
-#include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/dist_sink.h>
-
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
+#include <filesystem>
 
 inline void setup_logger(bool verbose, std::string name) {
     // 创建logs目录
@@ -36,3 +35,28 @@ inline void setup_logger(bool verbose, std::string name) {
         spdlog::debug("Verbose logging enabled");
     }
 }
+
+namespace NodeUtils {
+using Node = std::pair<size_t, std::array<float, 2>>;
+using Pos = std::array<float, 2>;
+
+size_t& index(Node& node) {
+    return node.first;
+}
+
+const size_t& index(const Node& node) {
+    return node.first;
+}
+
+Pos& pos(Node& node) {
+    return node.second;
+}
+
+const Pos& pos(const Node& node) {
+    return node.second;
+}
+
+bool convex(const Pos& a, const Pos& b, const Pos& c) {
+    return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]) > 0;
+}
+}  // namespace NodeUtils
