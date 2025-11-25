@@ -8,3 +8,12 @@ Graph build_fmvs_graph(const VectorList& data_e,
                        int ef_spatial,
                        int ef_attribute,
                        int max_edges);
+
+template <typename Q_Type>
+std::vector<std::pair<size_t, std::array<float, 2>>> pareto_search(
+    const Graph& g,
+    const Q_Type& q,
+    const VectorList& data_e,
+    const VectorList& data_s,
+    const std::vector<size_t>& start_nodes,
+    int size);
