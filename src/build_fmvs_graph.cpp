@@ -41,7 +41,14 @@ void prune(size_t i,
             const auto& duv =
                 std::array{data_e.dist2(iu, iv), data_s.dist2(iu, iv)};
             auto r = merge(alpha_less(div, diu), alpha_less(duv, diu));
-            e.remove(r.first, r.second);
+            for (auto v_r : edges[i_edge].alpha) {
+                auto nr = merge(r, v_r);
+                e.remove(nr.first, nr.second);
+            }
+            if (!e.empty()) {
+                ins.emplace_back(j, edges.size());
+                edges.push_back(e);
+            }
         }
     }
 }
