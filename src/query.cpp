@@ -1,3 +1,4 @@
+#include <spdlog/spdlog.h>
 #include <FIO.hpp>
 #include <Utils.hpp>
 #include <VectorList.hpp>
@@ -29,8 +30,19 @@ int main() {
     spdlog::info("Query file: {}", query_file);
 
     VectorList total(vector_file);
-    VectorList base = total.clone(0, 1000);
-    VectorList addition = total.clone(1000, 2000);
+    VectorList base = total.clone(0, 100000);
+    VectorList addition = total.clone(100000, 200000);
 
+    Graph g;
+    std::ifstream gin(graph_index, std::ios::binary);
+    g.load(gin);
+    // VectorList query(query_file);
+    spdlog::info("Graph loaded.");
+    auto res = beam_search(g, base[50], addition[50], base, addition, k, alpha,
+                           35999, beam_size);
+    for (auto i : res) {
+        std::cout << i << " ";
+    }
+    std::cout << std::endl;
     return 0;
 }
