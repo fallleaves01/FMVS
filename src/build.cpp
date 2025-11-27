@@ -27,8 +27,8 @@ int main() {
     spdlog::info("max_edges: {}", max_edges);
 
     VectorList total(vector_file);
-    VectorList base = total.clone(0, 1000);
-    VectorList addition = total.clone(1000, 2000);
+    VectorList base = total.clone(0, 100000);
+    VectorList addition = total.clone(100000, 200000);
 
     std::ofstream fout(output_file, std::ios::binary);
     build_fmvs_graph(base, addition, ef_spatial, ef_attribute, max_edges)
