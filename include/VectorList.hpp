@@ -71,6 +71,9 @@ class VectorList {
         }
     }
 
+    const Eigen::VectorXf& operator[](size_t i) const { return data[i]; }
+    Eigen::VectorXf& operator[](size_t i) { return data[i]; }
+
     VectorList clone(size_t l = 0, size_t r = -1) const {
         VectorList res;
         l = std::min(l, data.size());

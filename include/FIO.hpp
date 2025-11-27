@@ -34,6 +34,7 @@ bool basic_vector_write(std::ostream& fout, const std::vector<T>& vec) {
 
 template <typename T>
 bool item_vector_write(std::ostream& fout, const std::vector<T>& vec) {
+    base_write(fout, vec.size());
     for (const auto& item : vec) {
         if (!item.save(fout)) {
             return false;
@@ -43,7 +44,9 @@ bool item_vector_write(std::ostream& fout, const std::vector<T>& vec) {
 }
 
 template <typename T>
-bool item_vector_read(std::istream& fin, std::vector<T>& vec, size_t n) {
+bool item_vector_read(std::istream& fin, std::vector<T>& vec) {
+    size_t n;
+    base_read(fin, n);
     vec.resize(n);
     for (size_t i = 0; i < n; ++i) {
         if (!vec[i].load(fin)) {

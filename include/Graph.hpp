@@ -70,11 +70,7 @@ class Graph {
             return true;
         }
         bool load(std::istream& in) {
-            size_t n;
-            if (!base_read(in, n)) {
-                return false;
-            }
-            if (!item_vector_read(in, edges, n)) {
+            if (!item_vector_read(in, edges)) {
                 return false;
             }
             return true;
@@ -100,11 +96,7 @@ class Graph {
         return true;
     }
     bool load(std::istream& in) {
-        size_t n;
-        if (!base_read(in, n)) {
-            return false;
-        }
-        if (!item_vector_read(in, nodes, n)) {
+        if (!item_vector_read(in, nodes)) {
             return false;
         }
         return true;
