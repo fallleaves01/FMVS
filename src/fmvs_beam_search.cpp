@@ -1,7 +1,8 @@
 #include <fmvs_algorithms.hpp>
 
 std::vector<size_t> beam_search(const Graph& g,
-                                const Eigen::VectorXf& q,
+                                const Eigen::VectorXf& q_e,
+                                const Eigen::VectorXf& q_s,
                                 const VectorList& data_e,
                                 const VectorList& data_s,
                                 size_t k,
@@ -10,8 +11,8 @@ std::vector<size_t> beam_search(const Graph& g,
                                 size_t beam_size) {
     phmap::flat_hash_set<size_t> visited, updated;
     std::vector<std::pair<float, size_t>> que;
-    que.push_back({alpha * data_e.dist2(start_node, q) +
-                       (1 - alpha) * data_s.dist2(start_node, q),
+    que.push_back({alpha * data_e.dist2(start_node, q_e) +
+                       (1 - alpha) * data_s.dist2(start_node, q_s),
                    start_node});
     visited.insert(start_node);
     for (size_t i = 0; i < que.size(); i++) {
@@ -23,8 +24,8 @@ std::vector<size_t> beam_search(const Graph& g,
             if (visited.contains(edge.to)) {
                 continue;
             }
-            float dis = alpha * data_e.dist(edge.to, q) +
-                        (1 - alpha) * data_s.dist(edge.to, q);
+            float dis = alpha * data_e.dist(edge.to, q_e) +
+                        (1 - alpha) * data_s.dist(edge.to, q_s);
             auto now = std::pair{dis, (size_t)edge.to};
             if (que.size() < beam_size) {
                 que.push_back(now);
