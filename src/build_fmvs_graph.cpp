@@ -32,33 +32,38 @@ void prune(size_t i,
            const VectorList& data_e,
            const VectorList& data_s,
            const std::vector<Node>& cand,
-           size_t max_edges,
-           std::vector<std::pair<Node, size_t>>& ins) {
-    size_t cnt = 0;
-    for (size_t j = 0; j < cand.size(); j++) {
+           size_t max_edges) {
+    for (size_t j = 0; j < cand.size() && edges.size() < max_edges; j++) {
         const auto& u = cand[j];
         size_t iu = index(u);
-        Graph::Node::Edge e(iu);
-        for (auto& [v, i_edge] : ins) {
-            size_t iv = index(v);
+        Graph::Node::Edge e(u);
+        for (auto& ei : edges) {
+            size_t iv = ei.to;
+            if (iu == iv) {
+                e.alpha.clear();
+                break;
+            }
+            if (!(i < iv && iv < iu) && !(iu < iv && iv < i)) {
+                continue;
+            }
             const auto& diu = pos(u);
-            const auto& div = pos(v);
+            const auto& div = std::array<float, 2>{ei.d_e, ei.d_s};
             const auto& duv =
                 std::array{data_e.dist(iu, iv), data_s.dist(iu, iv)};
             auto r = merge(alpha_less(div, diu), alpha_less(duv, diu));
-            for (auto v_r : edges[i_edge].alpha) {
+            for (auto v_r : ei.alpha) {
                 auto nr = merge(r, v_r);
                 e.remove(nr.first, nr.second);
             }
         }
         if (!e.empty()) {
-            ins.emplace_back(u, edges.size());
             edges.push_back(e);
-            if (++cnt > max_edges) {
-                return;
-            }
         }
     }
+}
+
+size_t index_dis(size_t a, size_t b) {
+    return a < b ? b - a : a - b;
 }
 }  // namespace BuildFMVS
 
@@ -85,21 +90,22 @@ Graph build_fmvs_graph(const VectorList& data_e,
         "Building FMVS graph with ef_spatial={}, ef_attribute={}, max_edges={}",
         ef_spatial, ef_attribute, max_edges);
 
-    std::vector<std::vector<std::pair<Node, size_t>>> ins_l(n), ins_r(n);
     std::atomic<size_t> progress(0);
 #pragma omp parallel for schedule(dynamic)
     for (size_t i = 0; i < n; i++) {
-        std::vector<Node> cand_l, cand_r;
-        for (size_t j = i - std::min(i, ef_attribute / 2); j < i; j++) {
-            cand_l.push_back(Node{j, {data_e.dist(i, j), data_s.dist(i, j)}});
+        std::vector<Node> cand;
+        for (size_t j = i - std::min(i, ef_attribute / 2);
+             j < std::min(n, i + ef_attribute / 2 + 1); j++) {
+            if (i == j) {
+                continue;
+            }
+            cand.push_back(Node{j, {data_e.dist(i, j), data_s.dist(i, j)}});
         }
-        std::ranges::reverse(cand_l);
-        for (size_t j = i + 1; j < std::min(n, i + ef_attribute / 2 + 1); j++) {
-            cand_r.push_back(Node{j, {data_e.dist(i, j), data_s.dist(i, j)}});
-        }
+        std::ranges::sort(cand, std::ranges::less{}, [&](const Node& node) {
+            return index_dis(i, index(node));
+        });
         auto& edge = g.get_edges(i);
-        prune(i, edge, data_e, data_s, cand_l, max_edges / 2, ins_l[i]);
-        prune(i, edge, data_e, data_s, cand_r, max_edges / 2, ins_r[i]);
+        prune(i, edge, data_e, data_s, cand, max_edges);
         if (progress.fetch_add(1) % 1000 == 0) {
             spdlog::info("{}/{} of attribute building done, degree = {}", i + 1,
                          n, edge.size());
@@ -128,24 +134,20 @@ Graph build_fmvs_graph(const VectorList& data_e,
     progress = 0;
 #pragma omp parallel for schedule(dynamic)
     for (size_t i = 0; i < n; i++) {
-        std::vector<Node> cand_l, cand_r;
+        std::vector<Node> cand;
         for (size_t j = 0; j < ef_spatial; j++) {
             auto& node = all_cand[i * ef_spatial + j];
             if (index(node) == size_t(-1)) {
                 break;
             }
-            if (i >= ef_attribute / 2 && index(node) < i - ef_attribute / 2) {
-                cand_l.push_back(node);
-            } else if (index(node) > i + ef_attribute / 2) {
-                cand_r.push_back(node);
-            }
+            cand.push_back(node);
         }
-        std::ranges::sort(cand_l, std::ranges::less{}, &Node::first);
-        std::ranges::sort(cand_r, std::ranges::greater{}, &Node::first);
+        std::ranges::sort(cand, std::ranges::less{}, [&](const Node& node) {
+            return index_dis(i, index(node));
+        });
         auto t3 = std::chrono::high_resolution_clock::now();
         auto& edge = g.get_edges(i);
-        prune(i, edge, data_e, data_s, cand_l, max_edges / 2, ins_l[i]);
-        prune(i, edge, data_e, data_s, cand_r, max_edges / 2, ins_r[i]);
+        prune(i, edge, data_e, data_s, cand, max_edges);
         auto t4 = std::chrono::high_resolution_clock::now();
         if (progress.fetch_add(1) % 1000 == 0) {
             spdlog::info("{}/{} of spatial building done, degree = {}", i + 1,

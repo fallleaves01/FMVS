@@ -1,5 +1,6 @@
 #pragma once
 #include <FIO.hpp>
+#include <Utils.hpp>
 #include <algorithm>
 #include <iostream>
 #include <vector>
@@ -9,9 +10,14 @@ class Graph {
     struct Node {
         struct Edge {
             unsigned to;
+            float d_e, d_s;
             std::vector<std::pair<float, float>> alpha;
             Edge() = default;
-            Edge(unsigned t) : to(t), alpha{std::pair{0.0f, 1.0f}} {}
+            Edge(NodeUtils::Node u)
+                : to(u.first),
+                  d_e(u.second[0]),
+                  d_s(u.second[1]),
+                  alpha{std::pair{0.0f, 1.0f}} {}
 
             void remove(float fl, float fr) {
                 if (fl >= fr) {
@@ -44,7 +50,8 @@ class Graph {
             }
 
             bool save(std::ostream& out) const {
-                if (!base_write(out, to)) {
+                if (!base_write(out, to) || !base_write(out, d_e) ||
+                    !base_write(out, d_s)) {
                     return false;
                 }
                 if (!basic_vector_write(out, alpha)) {
@@ -53,7 +60,8 @@ class Graph {
                 return true;
             }
             bool load(std::istream& in) {
-                if (!base_read(in, to)) {
+                if (!base_read(in, to) || !base_read(in, d_e) ||
+                    !base_read(in, d_s)) {
                     return false;
                 }
                 if (!basic_vector_read(in, alpha)) {
