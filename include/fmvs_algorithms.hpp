@@ -17,6 +17,7 @@ inline std::vector<Node> find_paretos(std::vector<Node> candidates,
                                       size_t size) {
     size = std::min(size, candidates.size());
     std::vector<Node> paretos;
+    size_t layer_cnt = 0;
     while (paretos.size() < size) {
         std::ranges::sort(candidates, [&](const Node& a, const Node& b) {
             return pos(a) < pos(b);
@@ -32,7 +33,13 @@ inline std::vector<Node> find_paretos(std::vector<Node> candidates,
         }
         candidates.swap(new_candidates);
         paretos.insert(paretos.end(), layer.begin(), layer.end());
+        layer_cnt++;
     }
+    if (paretos.size() > size) {
+        paretos.resize(size);
+    }
+    // spdlog::debug("Pareto layers used: {}, total paretos: {}", layer_cnt,
+    //               paretos.size());
     return paretos;
 }
 
@@ -51,12 +58,16 @@ std::vector<NodeUtils::Node> pareto_search(
     phmap::flat_hash_set<size_t> visited, updated;
     std::vector<Node> result;
     for (auto i : start_nodes) {
-        float dist_e = data_e.dist(i, q);
-        float dist_s = data_s.dist(i, q);
-        result.emplace_back(Node{i, {dist_e, dist_s}});
-        visited.insert(i);
+        if (!visited.contains(i)) {
+            float dist_e = data_e.dist(i, q);
+            float dist_s = data_s.dist(i, q);
+            result.emplace_back(Node{i, {dist_e, dist_s}});
+            visited.insert(i);
+        }
     }
+    size_t cnt = 0;
     while (true) {
+        cnt++;
         std::vector<Node> ins;
         for (auto& node : result) {
             if (!updated.contains(index(node))) {
@@ -79,11 +90,15 @@ std::vector<NodeUtils::Node> pareto_search(
         result.insert(result.end(), ins.begin(), ins.end());
         result = find_paretos(std::move(result), size);
     }
+    // spdlog::debug(
+    //     "Pareto search finished in {} iterations, with {} visited nodes",
+    //     cnt, visited.size());
     return result;
 }
 
 std::vector<size_t> beam_search(const Graph& g,
-                                const Eigen::VectorXf& q,
+                                const Eigen::VectorXf& q_e,
+                                const Eigen::VectorXf& q_s,
                                 const VectorList& data_e,
                                 const VectorList& data_s,
                                 size_t k,
