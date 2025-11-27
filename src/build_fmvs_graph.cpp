@@ -1,6 +1,9 @@
+#include <omp.h>
 #include <phmap.h>
 #include <Utils.hpp>
+#include <atomic>
 #include <fmvs_algorithms.hpp>
+#include <random>
 #include <ranges>
 
 namespace BuildFMVS {
@@ -59,11 +62,21 @@ void prune(size_t i,
 }
 }  // namespace BuildFMVS
 
+size_t get_thread_random_int(size_t max) {
+    static thread_local std::mt19937 generator(std::random_device{}() +
+                                               omp_get_thread_num());
+    std::uniform_int_distribution<size_t> distribution(0, max);
+    return distribution(generator);
+}
+
 Graph build_fmvs_graph(const VectorList& data_e,
                        const VectorList& data_s,
                        size_t ef_spatial,
                        size_t ef_attribute,
                        size_t max_edges) {
+    // 如果需要强制限制线程数，取消下面这行的注释
+    omp_set_num_threads(32);
+
     using namespace BuildFMVS;
     assert(data_s.size() == data_e.size());
     size_t n = data_e.size();
@@ -73,6 +86,8 @@ Graph build_fmvs_graph(const VectorList& data_e,
         ef_spatial, ef_attribute, max_edges);
 
     std::vector<std::vector<std::pair<Node, size_t>>> ins_l(n), ins_r(n);
+    std::atomic<size_t> progress(0);
+#pragma omp parallel for schedule(dynamic)
     for (size_t i = 0; i < n; i++) {
         std::vector<Node> cand_l, cand_r;
         for (size_t j = i - std::min(i, ef_attribute / 2); j < i; j++) {
@@ -85,31 +100,61 @@ Graph build_fmvs_graph(const VectorList& data_e,
         auto& edge = g.get_edges(i);
         prune(i, edge, data_e, data_s, cand_l, max_edges / 2, ins_l[i]);
         prune(i, edge, data_e, data_s, cand_r, max_edges / 2, ins_r[i]);
-        if (i % 100 == 0) {
+        if (progress.fetch_add(1) % 1000 == 0) {
             spdlog::info("{}/{} of attribute building done, degree = {}", i + 1,
                          n, edge.size());
         }
     }
+    std::vector<Node> all_cand(n * ef_spatial, Node{size_t(-1), {0.0f, 0.0f}});
+
+    progress = 0;
+#pragma omp parallel for schedule(dynamic)
     for (size_t i = 0; i < n; i++) {
-        auto cand =
-            pareto_search(g, i, data_e, data_s, std::vector{i}, ef_spatial);
+        std::vector<size_t> ins;
+        for (size_t j = 0; j < ef_spatial; j++) {
+            ins.push_back(get_thread_random_int(n - 1));
+        }
+        auto cand = pareto_search(g, i, data_e, data_s, ins, ef_spatial);
+        // for (auto i : cand) {
+        //     std::cout << index(i) << " ";
+        // }
+        // std::cout << std::endl;
+        std::ranges::copy(cand, all_cand.begin() + i * ef_spatial);
+        if (progress.fetch_add(1) % 1000 == 0) {
+            spdlog::info("{}/{} of spatial candidate search done", i + 1, n);
+        }
+    }
+
+    progress = 0;
+#pragma omp parallel for schedule(dynamic)
+    for (size_t i = 0; i < n; i++) {
         std::vector<Node> cand_l, cand_r;
-        for (auto& node : cand) {
-            if (index(node) < i) {
+        for (size_t j = 0; j < ef_spatial; j++) {
+            auto& node = all_cand[i * ef_spatial + j];
+            if (index(node) == size_t(-1)) {
+                break;
+            }
+            if (i >= ef_attribute / 2 && index(node) < i - ef_attribute / 2) {
                 cand_l.push_back(node);
-            } else if (index(node) > i) {
+            } else if (index(node) > i + ef_attribute / 2) {
                 cand_r.push_back(node);
             }
         }
         std::ranges::sort(cand_l, std::ranges::less{}, &Node::first);
         std::ranges::sort(cand_r, std::ranges::greater{}, &Node::first);
+        auto t3 = std::chrono::high_resolution_clock::now();
         auto& edge = g.get_edges(i);
         prune(i, edge, data_e, data_s, cand_l, max_edges / 2, ins_l[i]);
         prune(i, edge, data_e, data_s, cand_r, max_edges / 2, ins_r[i]);
-        if (i % 100 == 0) {
-            spdlog::info(
-                "{}/{} of spatial building done, candiadtes = {}, degree = {}",
-                i + 1, n, cand.size(), edge.size());
+        auto t4 = std::chrono::high_resolution_clock::now();
+        if (progress.fetch_add(1) % 1000 == 0) {
+            spdlog::info("{}/{} of spatial building done, degree = {}", i + 1,
+                         n, edge.size());
+            spdlog::debug(
+                "Sample {}: prunning took {} ms", i,
+                std::chrono::duration_cast<std::chrono::nanoseconds>(t4 - t3)
+                        .count() *
+                    0.000001);
         }
     }
     return g;
