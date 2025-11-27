@@ -11,8 +11,8 @@ std::vector<size_t> beam_search(const Graph& g,
                                 size_t beam_size) {
     phmap::flat_hash_set<size_t> visited, updated;
     std::vector<std::pair<float, size_t>> que;
-    que.push_back({alpha * data_e.dist2(start_node, q_e) +
-                       (1 - alpha) * data_s.dist2(start_node, q_s),
+    que.push_back({alpha * data_e.dist(start_node, q_e) +
+                       (1 - alpha) * data_s.dist(start_node, q_s),
                    start_node});
     visited.insert(start_node);
     for (size_t i = 0; i < que.size(); i++) {
@@ -36,6 +36,30 @@ std::vector<size_t> beam_search(const Graph& g,
                 visited.insert(edge.to);
                 que.pop_back();
             }
+        }
+    }
+    std::vector<size_t> result;
+    for (size_t i = 0; i < k && i < que.size(); i++) {
+        result.push_back(que[i].second);
+    }
+    return result;
+}
+
+std::vector<size_t> linear_search(const Eigen::VectorXf& q_e,
+                                  const Eigen::VectorXf& q_s,
+                                  const VectorList& data_e,
+                                  const VectorList& data_s,
+                                  size_t k,
+                                  float alpha) {
+    std::vector<std::pair<float, size_t>> que;
+    for (size_t i = 0; i < q_e.size(); i++) {
+        float dis =
+            alpha * data_e.dist(i, q_e) + (1 - alpha) * data_s.dist(i, q_s);
+        auto now = std::pair{dis, i};
+        auto it = std::ranges::lower_bound(que, now);
+        que.insert(it, now);
+        if (que.size() > k) {
+            que.pop_back();
         }
     }
     std::vector<size_t> result;

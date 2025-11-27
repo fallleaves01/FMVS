@@ -159,7 +159,7 @@ add_executable(fmvs_build
 
 add_executable(fmvs_query
   src/query.cpp
-  src/fmvs_beam_search.cpp
+  src/fmvs_search.cpp
   ${HEADER_FILES}
 )
 
