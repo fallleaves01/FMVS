@@ -60,3 +60,6 @@ inline bool convex(const Pos& a, const Pos& b, const Pos& c) {
     return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]) > 0;
 }
 }  // namespace NodeUtils
+
+template <typename T>
+std::map<std::string, T> InfoRec;

@@ -33,8 +33,8 @@ int main() {
     VectorList v_e = total.clone(0, 100000);
     VectorList v_s = total.clone(100000, 200000);
     VectorList query(query_file);
-    auto q_e = query.clone(0, 5);
-    auto q_s = query.clone(5, 10);
+    auto q_e = query.clone(0, 500);
+    auto q_s = query.clone(500, 1000);
     spdlog::info("Vectors loaded.");
 
     Graph g;
@@ -82,8 +82,12 @@ int main() {
         total_correct += correct;
         spdlog::info("Query {}: Correct {}/{}", i, correct, k);
     }
-    spdlog::info("Average query time: {} us", total_time.load() / q_e.size());
+    spdlog::info("Average query time: {} us, QPS = {}",
+                 total_time.load() / q_e.size(),
+                 1000000.0 / (total_time.load() / q_e.size()));
     spdlog::info("Average recall@{}: {:.4f}", k,
                  (float)total_correct.load() / (k * q_e.size()));
+    spdlog::info("Average distance computations: {:.2f}",
+                 (float)InfoRec<size_t>["dis_count"] / q_e.size());
     return 0;
 }

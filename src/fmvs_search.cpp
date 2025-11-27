@@ -15,25 +15,29 @@ std::vector<size_t> beam_search(const Graph& g,
                        (1 - alpha) * data_s.dist(start_node, q_s),
                    start_node});
     visited.insert(start_node);
+    size_t dis_count = 0;
     for (size_t i = 0; i < que.size(); i++) {
         size_t curr = que[i].second;
         if (updated.contains(curr)) {
             continue;
         }
+        updated.insert(curr);
         for (auto& edge : g.get_edges(curr)) {
             if (visited.contains(edge.to)) {
                 continue;
             }
             float dis = alpha * data_e.dist(edge.to, q_e) +
                         (1 - alpha) * data_s.dist(edge.to, q_s);
+            dis_count++;
             auto now = std::pair{dis, (size_t)edge.to};
-            if (que.size() < beam_size) {
-                que.push_back(now);
-                visited.insert(edge.to);
-            } else if (dis < que.back().first) {
-                auto it = std::ranges::lower_bound(que, now);
-                que.insert(it, now);
-                visited.insert(edge.to);
+            if (que.size() == beam_size && dis >= que.back().first) {
+                continue;
+            }
+            auto it = std::ranges::lower_bound(que, now);
+            i = std::min(i, (size_t)(it - que.begin()) - 1);
+            que.insert(it, now);
+            visited.insert(edge.to);
+            if (que.size() > beam_size) {
                 que.pop_back();
             }
         }
@@ -42,6 +46,7 @@ std::vector<size_t> beam_search(const Graph& g,
     for (size_t i = 0; i < k && i < que.size(); i++) {
         result.push_back(que[i].second);
     }
+    InfoRec<size_t>["dis_count"] += dis_count;
     return result;
 }
 
@@ -52,7 +57,7 @@ std::vector<size_t> linear_search(const Eigen::VectorXf& q_e,
                                   size_t k,
                                   float alpha) {
     std::vector<std::pair<float, size_t>> que;
-    for (size_t i = 0; i < q_e.size(); i++) {
+    for (size_t i = 0; i < data_e.size(); i++) {
         float dis =
             alpha * data_e.dist(i, q_e) + (1 - alpha) * data_s.dist(i, q_s);
         auto now = std::pair{dis, i};
