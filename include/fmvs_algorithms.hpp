@@ -7,6 +7,7 @@
 
 Graph build_fmvs_graph(const VectorList& data_e,
                        const VectorList& data_s,
+                       const std::vector<size_t>& labels,
                        size_t ef_spatial,
                        size_t ef_attribute,
                        size_t max_edges);

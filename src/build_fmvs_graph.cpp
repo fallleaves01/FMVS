@@ -76,6 +76,7 @@ size_t get_thread_random_int(size_t max) {
 
 Graph build_fmvs_graph(const VectorList& data_e,
                        const VectorList& data_s,
+                       const std::vector<size_t>& labels,
                        size_t ef_spatial,
                        size_t ef_attribute,
                        size_t max_edges) {
@@ -84,6 +85,7 @@ Graph build_fmvs_graph(const VectorList& data_e,
 
     using namespace BuildFMVS;
     assert(data_s.size() == data_e.size());
+    assert(data_s.size() == labels.size());
     size_t n = data_e.size();
     Graph g(n);
     spdlog::info(
@@ -91,24 +93,33 @@ Graph build_fmvs_graph(const VectorList& data_e,
         ef_spatial, ef_attribute, max_edges);
 
     std::atomic<size_t> progress(0);
-#pragma omp parallel for schedule(dynamic)
+    std::vector<size_t> id(n), pos(n);
+    std::iota(id.begin(), id.end(), 0);
+    std::ranges::sort(id, std::ranges::less{},
+                      [&](size_t a) { return labels[a]; });
     for (size_t i = 0; i < n; i++) {
+        pos[id[i]] = i;
+    }
+#pragma omp parallel for schedule(dynamic)
+    for (size_t pi = 0; pi < n; pi++) {
         std::vector<Node> cand;
-        for (size_t j = i - std::min(i, ef_attribute / 2);
-             j < std::min(n, i + ef_attribute / 2 + 1); j++) {
-            if (i == j) {
+        for (size_t pj = pi - std::min(pi, ef_attribute / 2);
+             pj < std::min(n, pi + ef_attribute / 2 + 1); pj++) {
+            if (pi == pj) {
                 continue;
             }
-            cand.push_back(Node{j, {data_e.dist(i, j), data_s.dist(i, j)}});
+            cand.push_back(Node{
+                id[pj],
+                {data_e.dist(id[pi], id[pj]), data_s.dist(id[pi], id[pj])}});
         }
         std::ranges::sort(cand, std::ranges::less{}, [&](const Node& node) {
-            return index_dis(i, index(node));
+            return index_dis(pi, pos[index(node)]);
         });
-        auto& edge = g.get_edges(i);
-        prune(i, edge, data_e, data_s, cand, max_edges);
+        auto& edge = g.get_edges(id[pi]);
+        prune(id[pi], edge, data_e, data_s, cand, max_edges);
         if (progress.fetch_add(1) % 1000 == 0) {
-            spdlog::info("{}/{} of attribute building done, degree = {}", i + 1,
-                         n, edge.size());
+            spdlog::info("{}/{} of attribute building done, degree = {}",
+                         progress.load() + 1, n, edge.size());
         }
     }
     std::vector<Node> all_cand(n * ef_spatial, Node{size_t(-1), {0.0f, 0.0f}});
@@ -143,7 +154,7 @@ Graph build_fmvs_graph(const VectorList& data_e,
             cand.push_back(node);
         }
         std::ranges::sort(cand, std::ranges::less{}, [&](const Node& node) {
-            return index_dis(i, index(node));
+            return index_dis(pos[i], pos[index(node)]);
         });
         auto t3 = std::chrono::high_resolution_clock::now();
         auto& edge = g.get_edges(i);
