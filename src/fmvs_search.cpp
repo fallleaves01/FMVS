@@ -1,6 +1,9 @@
 #include <fmvs_algorithms.hpp>
 
 std::vector<size_t> beam_search(const Graph& g,
+                                const std::vector<size_t>& labels,
+                                const std::array<size_t, 2>& intervals, //询问区间
+                                const std::vector<uint8_t>& valid_mask,
                                 const Eigen::VectorXf& q_e,
                                 const Eigen::VectorXf& q_s,
                                 const VectorList& data_e,
@@ -26,6 +29,9 @@ std::vector<size_t> beam_search(const Graph& g,
             if (visited.contains(edge.to)) {
                 continue;
             }
+            if (labels[edge.to]<intervals[0]||labels[edge.to]>intervals[1]) {
+                continue;
+            }
             float dis = alpha * data_e.dist(edge.to, q_e) +
                         (1 - alpha) * data_s.dist(edge.to, q_s);
             dis_count++;
@@ -43,14 +49,19 @@ std::vector<size_t> beam_search(const Graph& g,
         }
     }
     std::vector<size_t> result;
-    for (size_t i = 0; i < k && i < que.size(); i++) {
+    for (size_t i = 0; result.size() < k && i < que.size(); i++) {
+        if(!valid_mask[que[i].second]) continue;
         result.push_back(que[i].second);
     }
     InfoRec<size_t>["dis_count"] += dis_count;
     return result;
 }
 
-std::vector<size_t> linear_search(const Eigen::VectorXf& q_e,
+std::vector<size_t> linear_search(
+                                  const std::vector<size_t>& labels,
+                                  const std::array<size_t, 2>& intervals,
+                                  const std::vector<uint8_t>& valid_mask,
+                                  const Eigen::VectorXf& q_e,
                                   const Eigen::VectorXf& q_s,
                                   const VectorList& data_e,
                                   const VectorList& data_s,
@@ -58,6 +69,10 @@ std::vector<size_t> linear_search(const Eigen::VectorXf& q_e,
                                   float alpha) {
     std::vector<std::pair<float, size_t>> que;
     for (size_t i = 0; i < data_e.size(); i++) {
+        if(!valid_mask[i]) continue;
+        if (labels[i]<intervals[0]||labels[i]>intervals[1]) {
+                continue;
+            }
         float dis =
             alpha * data_e.dist(i, q_e) + (1 - alpha) * data_s.dist(i, q_s);
         auto now = std::pair{dis, i};
@@ -68,7 +83,7 @@ std::vector<size_t> linear_search(const Eigen::VectorXf& q_e,
         }
     }
     std::vector<size_t> result;
-    for (size_t i = 0; i < k && i < que.size(); i++) {
+    for (size_t i = 0; result.size() < k && i < que.size(); i++) {
         result.push_back(que[i].second);
     }
     return result;

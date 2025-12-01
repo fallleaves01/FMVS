@@ -163,12 +163,19 @@ add_executable(fmvs_query
   ${HEADER_FILES}
 )
 
+add_executable(fmvs_change
+  src/change.cpp
+  src/delete_fmvs_graph.cpp
+  src/insert_fmvs_graph.cpp
+  ${HEADER_FILES}
+)
 # ========================================================
 #  统一应用配置
 # ========================================================
 
 # 使用循环为所有目标应用配置和属性
-foreach(TARGET_NAME fmvs_build fmvs_query)
+foreach(TARGET_NAME fmvs_build fmvs_query fmvs_change)
+
   # 链接公共配置
   target_link_libraries(${TARGET_NAME} PRIVATE fmvs_common_config)
   

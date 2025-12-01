@@ -1,0 +1,14 @@
+{
+    "old_vector_file": "/mnt/win-dai/liangsiyuan/FMVS/data/test_insert/total_vectors.fvecs",
+    "new_vector_file": "/mnt/win-dai/liangsiyuan/FMVS/data/test_insert/new_vectors.fvecs",
+    "graph_file": "/mnt/win-dai/liangsiyuan/FMVS/index/test_insert/fmvs_graph.bin",
+    "old_label_file": "/mnt/win-dai/liangsiyuan/FMVS/data/test_insert/labels.json",
+    "new_label_file": "/mnt/win-dai/liangsiyuan/FMVS/data/test_insert/new_labels.json",
+    "ef_spatial": 250,
+    "ef_attribute": 250,
+    "max_edges": 250,
+    "debug_output": true,
+    "headstone_file": "/mnt/win-dai/liangsiyuan/FMVS/data/test_insert/headstone.json",
+    "delete_file": "/headstone_file.json",
+    "id_flag": 0
+}

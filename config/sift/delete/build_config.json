@@ -1,0 +1,10 @@
+{
+  "vector_file": "/mnt/win-dai/liangsiyuan/FMVS/data/test_delete/total_vectors.fvecs",
+  "output_file": "/mnt/win-dai/liangsiyuan/FMVS/index/test_delete/fmvs_graph.bin",
+  "label_file": "/mnt/win-dai/liangsiyuan/FMVS/data/test_delete/labels.json",
+  "headstone_file": "/mnt/win-dai/liangsiyuan/FMVS/data/test_delete/headstone.json",
+  "ef_spatial": 250,
+  "ef_attribute": 250,
+  "max_edges": 250,
+  "debug_output": true
+}

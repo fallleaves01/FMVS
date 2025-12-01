@@ -14,10 +14,13 @@ int main() {
     std::string vector_file = mp["vector_file"];
     std::string output_file = mp["output_file"];
     std::string label_file = mp["label_file"];
+    std::string headstone_file = mp["headstone_file"]; //墓碑标记文件路径
+
     int ef_spatial = mp["ef_spatial"];
     int ef_attribute = mp["ef_attribute"];
     int max_edges = mp["max_edges"];
     bool debug_output = mp["debug_output"];
+    
 
     setup_logger(debug_output, "FMVS_Builder");
     spdlog::info("Configuration loaded:");
@@ -29,17 +32,29 @@ int main() {
     spdlog::info("Label file: {}", label_file);
 
     VectorList total(vector_file);
-    VectorList base = total.clone(0, 100000);
-    VectorList addition = total.clone(100000, 200000);
+    size_t n = total.size();
+    VectorList base = total.clone(0, n/2);
+    VectorList addition = total.clone(n/2, n);
 
     std::ifstream fin_label(label_file);
     nlohmann::json labels;
     fin_label >> labels;
     std::vector<size_t> label = labels;
-    label.resize(100000);
+    label.resize(n/2);
 
     std::ofstream fout(output_file, std::ios::binary);
     build_fmvs_graph(base, addition, label, ef_spatial, ef_attribute, max_edges)
         .save(fout);
+
+    std::vector<uint8_t>valid_mask(n/2,1);
+    size_t invalid_count = 0;
+    nlohmann::json j2;
+    j2["valid"] = valid_mask;
+    j2["invalid_count"] = invalid_count;
+    std::ofstream fout_head(headstone_file);
+    if (!fout_head) {
+        throw std::runtime_error("Cannot open " + headstone_file + " for write");
+    }
+    fout_head << j2.dump();
     return 0;
 }

@@ -1,0 +1,15 @@
+[2025-12-02 01:48:21] [info] [:] Configuration loaded:
+[2025-12-02 01:48:21] [info] [:] Beam size: 150
+[2025-12-02 01:48:22] [info] [:] Vector dimension: 768
+[2025-12-02 01:48:22] [info] [:] Number of vectors: 200000
+[2025-12-02 01:48:22] [info] [:] Cloned VectorList from 0 to 100000, size 100000
+[2025-12-02 01:48:23] [info] [:] Cloned VectorList from 100000 to 200000, size 100000
+[2025-12-02 01:48:23] [info] [:] Vector dimension: 768
+[2025-12-02 01:48:23] [info] [:] Number of vectors: 2000
+[2025-12-02 01:48:23] [info] [:] Cloned VectorList from 0 to 1000, size 1000
+[2025-12-02 01:48:23] [info] [:] Cloned VectorList from 1000 to 2000, size 1000
+[2025-12-02 01:48:23] [info] [:] Vectors loaded.
+[2025-12-02 01:48:26] [info] [:] Graph loaded.
+[2025-12-02 01:49:08] [info] [:] Average query time: 17932 us, QPS = 55.76622797233995
+[2025-12-02 01:49:08] [info] [:] Average recall@10: 0.9940
+[2025-12-02 01:49:08] [info] [:] Average distance computations: 16519.10
