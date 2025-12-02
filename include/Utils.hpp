@@ -1,9 +1,11 @@
 #pragma once
+#include <omp.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/dist_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 #include <filesystem>
+#include <random>
 
 inline void setup_logger(bool verbose, std::string name) {
     // 创建logs目录
@@ -63,3 +65,10 @@ inline bool convex(const Pos& a, const Pos& b, const Pos& c) {
 
 template <typename T>
 std::map<std::string, T> InfoRec;
+
+inline size_t get_thread_random_int(size_t max) {
+    static thread_local std::mt19937 generator(std::random_device{}() +
+                                               omp_get_thread_num());
+    std::uniform_int_distribution<size_t> distribution(0, max);
+    return distribution(generator);
+}

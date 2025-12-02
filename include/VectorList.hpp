@@ -1,5 +1,4 @@
 #pragma once
-#include <spdlog/spdlog.h>
 #include <Eigen/Dense>
 #include <FIO.hpp>
 #include <iostream>
@@ -42,22 +41,25 @@ class VectorList {
         return true;
     }
     bool save(std::ostream& fout) const {
-        if (data.empty()) return true;
+        if (data.empty())
+            return true;
         int32_t dim = static_cast<int32_t>(data[0].size());
         for (const auto& v : data) {
             // 每个向量：先写 dim，再写 dim 个 float
             fout.write(reinterpret_cast<const char*>(&dim), sizeof(int32_t));
             fout.write(reinterpret_cast<const char*>(v.data()),
                        sizeof(float) * dim);
-            if (!fout.good()) return false;
+            if (!fout.good())
+                return false;
         }
         return true;
     }
     bool save(const std::string& filename) const {
         std::ofstream fout(filename, std::ios::binary);
-        if (!fout) return false;
+        if (!fout)
+            return false;
         return save(fout);
-    }//存回原来的路径
+    }  // 存回原来的路径
 
     template <typename T>
     float dist2(size_t i, const T& j) const {
@@ -105,17 +107,17 @@ class VectorList {
                      res.data.size());
         return res;
     }
-    
+
     void append(const VectorList& other) {
         data.insert(data.end(), other.data.begin(), other.data.end());
-        sqr.insert(sqr.end(),  other.sqr.begin(),  other.sqr.end());
-    }//把数组追在后面
+        sqr.insert(sqr.end(), other.sqr.begin(), other.sqr.end());
+    }  // 把数组追在后面
 
     void append_from(const VectorList& other, size_t idx) {
         data.push_back(other.data[idx]);
         sqr.push_back(other.sqr[idx]);
-    }//追加一个
-    
+    }  // 追加一个
+
     const size_t size() const { return data.size(); }
 
    private:

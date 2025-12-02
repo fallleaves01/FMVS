@@ -109,9 +109,8 @@ class Graph {
         }
         return true;
     }
-    void resize(size_t n) {
-        nodes.resize(n);
-    }
+    void resize(size_t n) { nodes.resize(n); }
+
    private:
     std::vector<Node> nodes;
 };

@@ -42,9 +42,9 @@ target_include_directories(spdlog_header_only
   INTERFACE
     ${spdlog_SOURCE_DIR}/include
 )
-target_compile_definitions(spdlog_header_only
-  INTERFACE SPDLOG_HEADER_ONLY=1
-)
+# target_compile_definitions(spdlog_header_only
+#   INTERFACE SPDLOG_HEADER_ONLY=1
+# )
 add_library(spdlog::spdlog ALIAS spdlog_header_only)
 
 # -------- Eigen：原生 header-only --------

@@ -1,5 +1,4 @@
 #pragma once
-#include <spdlog/spdlog.h>
 #include <Graph.hpp>
 #include <Utils.hpp>
 #include <VectorList.hpp>
