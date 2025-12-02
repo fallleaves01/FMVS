@@ -12,14 +12,16 @@ int main() {
     nlohmann::json config;
     fin >> config;
     auto mp = config.get<std::map<std::string, nlohmann::json>>();
-    std::string vector_file = mp["vector_file"];//文档向量
+    std::string vector_file_base = mp["vector_file_base"];//文档向量1
+    std::string vector_file_addition = mp["vector_file_addition"];//文档向量2
     std::string label_file = mp["label_file"];//文档labels
     std::string graph_index = mp["graph_index"];//图索引
     std::string headstone_file = mp["headstone_file"];//墓碑标记文件路径
     int beam_size = mp["beam_size"];
     std::string alpha_file = mp["alpha"];
     int k = mp["k"];
-    std::string query_file = mp["query_file"];//询问向量
+    std::string query_file_base = mp["query_file_base"];//询问向量1
+    std::string query_file_addition = mp["query_file_addition"];//询问向量2
     std::string query_label = mp["query_label"];//询问区间
     bool debug_output = mp["debug_output"];
     
@@ -56,14 +58,14 @@ int main() {
     std::vector<float> alpha=j_alpha;
     fin_alpha.close();
 
-    VectorList total(vector_file);
-    size_t n = total.size();
-    VectorList v_e = total.clone(0, n/2);
-    VectorList v_s = total.clone(n/2, n);
-    VectorList query(query_file);
-    size_t m = query.size();
-    auto q_e = query.clone(0, m/2);
-    auto q_s = query.clone(m/2, m);
+    
+    VectorList v_e(vector_file_base);
+    VectorList v_s(vector_file_addition);
+    size_t n = v_e.size()*2;
+    
+    VectorList q_e(query_file_base);
+    VectorList q_s(query_file_addition);
+    size_t m = q_e.size()*2;
 
     spdlog::info("Vectors loaded.");
 

@@ -1,0 +1,11 @@
+{
+  "vector_file_base": "/mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/delete/total_vectors_base.fvecs",
+  "vector_file_addition": "/mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/delete/total_vectors_addition.fvecs",
+  "output_file": "/mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/index/delete/fmvs_graph_2.bin",
+  "label_file": "/mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/delete/labels.json",
+  "headstone_file": "/mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/delete/headstone.json",
+  "ef_spatial": 250,
+  "ef_attribute": 250,
+  "max_edges": 250,
+  "debug_output": true
+}

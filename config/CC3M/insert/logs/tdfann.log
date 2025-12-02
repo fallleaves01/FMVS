@@ -1,0 +1,15 @@
+[2025-12-02 11:46:28] [info] [:] Configuration loaded:
+[2025-12-02 11:46:28] [info] [:] Beam size: 150
+[2025-12-02 11:46:28] [info] [:] Vector dimension: 1024
+[2025-12-02 11:46:28] [info] [:] Number of vectors: 100000
+[2025-12-02 11:46:29] [info] [:] Vector dimension: 768
+[2025-12-02 11:46:29] [info] [:] Number of vectors: 100000
+[2025-12-02 11:46:29] [info] [:] Vector dimension: 1024
+[2025-12-02 11:46:29] [info] [:] Number of vectors: 1000
+[2025-12-02 11:46:29] [info] [:] Vector dimension: 768
+[2025-12-02 11:46:29] [info] [:] Number of vectors: 1000
+[2025-12-02 11:46:29] [info] [:] Vectors loaded.
+[2025-12-02 11:46:32] [info] [:] Graph loaded.
+[2025-12-02 11:47:17] [info] [:] Average query time: 19414 us, QPS = 51.509220150406925
+[2025-12-02 11:47:17] [info] [:] Average recall@10: 0.9956
+[2025-12-02 11:47:17] [info] [:] Average distance computations: 17156.76

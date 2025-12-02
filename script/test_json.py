@@ -68,4 +68,7 @@ python3 /home/liangsiyuan/FMVS/FMVS/script/test_json.py \
 
 python3 /home/liangsiyuan/FMVS/FMVS/script/test_json.py \
 /mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/insert/labels.json
+
+python3 /home/liangsiyuan/FMVS/FMVS/script/test_json.py \
+/mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/insert/labels.json
 '''

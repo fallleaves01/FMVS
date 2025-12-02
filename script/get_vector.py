@@ -122,4 +122,23 @@ python3 /home/liangsiyuan/FMVS/FMVS/script/get_vector.py \
   /mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/delete/base_e2.fvecs \
   110000
 
+python3 /home/liangsiyuan/FMVS/FMVS/script/get_vector.py \
+  /mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data_src/base_img_emb.fvecs \
+  /mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/insert/base_e1.fvecs \
+  100000
+
+python3 /home/liangsiyuan/FMVS/FMVS/script/get_vector.py \
+  /mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data_src/base_text_emb.fvecs \
+  /mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/insert/base_e2.fvecs \
+  100000
+
+python3 /home/liangsiyuan/FMVS/FMVS/script/get_vector.py \
+  /mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data_src/base_img_emb.fvecs \
+  /mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/delete/total_vectors_base.fvecs \
+  110000
+
+python3 /home/liangsiyuan/FMVS/FMVS/script/get_vector.py \
+  /mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data_src/base_text_emb.fvecs \
+  /mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/delete/total_vectors_addition.fvecs \
+  110000
 '''

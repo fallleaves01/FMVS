@@ -59,4 +59,8 @@ python3 /home/liangsiyuan/FMVS/FMVS/script/gen_labels.py \
 110000 \
 /mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/delete/labels.json
 
+python3 /home/liangsiyuan/FMVS/FMVS/script/gen_labels.py \
+110000 \
+/mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/delete/labels.json
+
 '''

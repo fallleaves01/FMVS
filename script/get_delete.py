@@ -49,4 +49,9 @@ python3 /home/liangsiyuan/FMVS/FMVS/script/get_delete.py \
   110000 \
   10000 \
   /mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/delete/delete_file.json
+
+python3 /home/liangsiyuan/FMVS/FMVS/script/get_delete.py \
+  109999 \
+  10000 \
+  /mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/delete/delete_file.json
 '''

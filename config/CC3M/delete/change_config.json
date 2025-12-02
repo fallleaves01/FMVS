@@ -1,0 +1,16 @@
+{
+    "old_vector_file_base": "/mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/delete/total_vectors_base.fvecs",
+    "old_vector_file_addition": "/mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/delete/total_vectors_addition.fvecs",
+    "new_vector_file_base": "",
+    "new_vector_file_addition": "",
+    "graph_file": "/mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/index/delete/fmvs_graph_2.bin",
+    "old_label_file": "/mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/delete/labels.json",
+    "new_label_file": "",
+    "ef_spatial": 250,
+    "ef_attribute": 250,
+    "max_edges": 250,
+    "debug_output": true,
+    "headstone_file": "/mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/delete/headstone.json",
+    "delete_file": "/mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/delete/delete_file.json",
+    "id_flag": 2
+}

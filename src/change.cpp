@@ -13,8 +13,10 @@ int main() {
     auto mp = config.get<std::map<std::string, nlohmann::json>>();
     int id_flag = mp["id_flag"];//执行插入还是删除
 
-    std::string old_vector_file = mp["old_vector_file"];//原始向量文件路径
-    std::string new_vector_file = mp["new_vector_file"];//增加向量文件路径
+    std::string old_vector_file_base = mp["old_vector_file_base"];//原始向量文件路径1
+    std::string old_vector_file_addition = mp["old_vector_file_addition"];//原始向量文件路径2
+    std::string new_vector_file_base = mp["new_vector_file_base"];//增加向量文件路径1
+    std::string new_vector_file_addition = mp["new_vector_file_addition"];//增加向量文件路径2
     std::string graph_file = mp["graph_file"];//图索引文件路径
     std::string old_label_file = mp["old_label_file"];//原始标签文件
     std::string new_label_file = mp["new_label_file"];//新标签文件
@@ -29,8 +31,10 @@ int main() {
     if(id_flag == 0) { //插入
         setup_logger(debug_output, "FMVS_Insert");
         spdlog::info("Configuration loaded:");
-        spdlog::info("Old Vector file: {}", old_vector_file);
-        spdlog::info("New Vector file: {}", new_vector_file);
+        spdlog::info("Old Vector file base: {}", old_vector_file_base);
+        spdlog::info("Old Vector file addition: {}", old_vector_file_addition);
+        spdlog::info("New Vector file base: {}", new_vector_file_base);
+        spdlog::info("New Vector file addition: {}", new_vector_file_addition);
         spdlog::info("Graph file: {}", graph_file);
         spdlog::info("ef_spatial: {}", ef_spatial);
         spdlog::info("ef_attribute: {}", ef_attribute);
@@ -49,17 +53,14 @@ int main() {
             throw std::runtime_error("Failed to load graph from file: " + graph_file);
         }
         //向量加载
-        VectorList old_total(old_vector_file);
-        size_t n = old_total.size();
-        VectorList old_base = old_total.clone(0, n/2);
-        VectorList old_addition = old_total.clone(n/2, n);
         
-        //新向量加载
-        VectorList new_total(new_vector_file);
-        size_t m = new_total.size();
-        VectorList new_base = new_total.clone(0, m/2);
-        VectorList new_addition = new_total.clone(m/2, m);
-
+        VectorList old_base(old_vector_file_base);
+        VectorList old_addition(old_vector_file_addition);
+        size_t n = old_base.size()*2;
+        
+        VectorList new_base(new_vector_file_base);
+        VectorList new_addition(new_vector_file_addition);
+        size_t m = new_base.size()*2;
         //标签加载
         std::ifstream fin_label(old_label_file);
         nlohmann::json labels;
@@ -95,9 +96,8 @@ int main() {
         }
         fout_label << j.dump();
         //扩充后的向量
-        old_base.append(old_addition);
-        old_base.save(old_vector_file);
-
+        old_base.save(old_vector_file_base);
+        old_addition.save(old_vector_file_addition);
         //扩充后的墓碑标记
         nlohmann::json j3;
         j3["valid"] = valid_mask;
@@ -143,10 +143,10 @@ int main() {
     }
     else if(id_flag == 2){ //彻底清除墓碑
         //向量
-        VectorList old_total(old_vector_file);
-        size_t n = old_total.size();
-        VectorList old_base = old_total.clone(0, n/2);
-        VectorList old_addition = old_total.clone(n/2, n);
+        VectorList old_base(old_vector_file_base);
+        VectorList old_addition(old_vector_file_addition);
+        size_t n = old_base.size()*2;
+
         VectorList new_base;
         VectorList new_addition;
         std::vector<size_t> new_label;
@@ -193,8 +193,8 @@ int main() {
         fout_label << j3.dump();
 
         //删除后的向量
-        new_base.append(new_addition);
-        new_base.save(old_vector_file);
+        new_base.save(old_vector_file_base);
+        new_addition.save(old_vector_file_addition);
         
         //删除后的墓碑
         std::vector<uint8_t>valid_mask_new(cnt,1);

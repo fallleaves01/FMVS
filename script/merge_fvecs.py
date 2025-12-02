@@ -96,4 +96,13 @@ python3 /home/liangsiyuan/FMVS/FMVS/script/merge_fvecs.py \
   /mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data_src/query_text_emb.fvecs \
   /mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/query_total.fvecs
 
+python3 /home/liangsiyuan/FMVS/FMVS/script/merge_fvecs.py \
+  /mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/insert/base_e1.fvecs \
+  /mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/insert/base_e2.fvecs \
+  /mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/insert/total_vectors.fvecs
+
+python3 /home/liangsiyuan/FMVS/FMVS/script/merge_fvecs.py \
+  /mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data_src/query_img_emb.fvecs \
+  /mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data_src/query_text_emb.fvecs \
+  /mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/insert/query_total.fvecs
 '''

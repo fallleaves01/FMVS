@@ -86,4 +86,10 @@ python3 /home/liangsiyuan/FMVS/FMVS/script/split_labels.py \
 /mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/insert/labels.json \
 /mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/insert/new_labels.json \
 90000
+
+python3 /home/liangsiyuan/FMVS/FMVS/script/split_labels.py \
+/mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/labels.json \
+/mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/insert/labels.json \
+/mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/insert/new_labels.json \
+90000
 '''
