@@ -60,6 +60,37 @@ inline void prune(size_t i,
     }
 }
 
+inline void prune(std::vector<Graph::Node::Edge>& edges,
+                  const VectorList& data_e,
+                  const VectorList& data_s,
+                  const std::vector<Node>& cand,
+                  size_t max_edges) {
+    for (size_t j = 0; j < cand.size() && edges.size() < max_edges; j++) {
+        const auto& u = cand[j];
+        size_t iu = index(u);
+        Graph::Node::Edge e(u);
+        for (auto& ei : edges) {
+            size_t iv = ei.to;
+            if (iu == iv) {
+                e.alpha.clear();
+                break;
+            }
+            const auto& diu = pos(u);
+            const auto& div = std::array<float, 2>{ei.d_e, ei.d_s};
+            const auto& duv =
+                std::array{data_e.dist(iu, iv), data_s.dist(iu, iv)};
+            auto r = merge(alpha_less(div, diu), alpha_less(duv, diu));
+            for (auto v_r : ei.alpha) {
+                auto nr = merge(r, v_r);
+                e.remove(nr.first, nr.second);
+            }
+        }
+        if (!e.empty()) {
+            edges.push_back(e);
+        }
+    }
+}
+
 inline size_t index_dis(size_t a, size_t b) {
     return a < b ? b - a : a - b;
 }
