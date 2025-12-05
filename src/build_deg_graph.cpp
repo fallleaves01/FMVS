@@ -45,33 +45,17 @@ Graph build_deg_graph(const VectorList& data_e,
         for (size_t j = i; j < std::min(i + Block, n); j++) {
             auto& edge = g.get_edges(j);
             prune(edge, data_e, data_s, cands[j - i], max_edges);
+            for (auto k : edge) {
+                // 反向边
+                auto& rev_edge = g.get_edges(k.to);
+                NodeUtils::Node rev_node{j, {k.d_e, k.d_s}};
+                std::vector<Node> rev_cand{rev_node};
+                prune(rev_edge, data_e, data_s, rev_cand, max_edges);
+            }
         }
         if (i % 1000 == 0) {
             spdlog::info("{}/{} of spatial candidate search done", i + 1, n);
         }
-    }
-    std::vector<size_t> cnt(n + 1);
-    for (int i = 0; i < n; i++) {
-        for (auto& e : g.get_edges(i)) {
-            cnt[e.to]++;
-        }
-    }
-    for (int i = 1; i <= n; i++) {
-        cnt[i] += cnt[i - 1];
-    }
-    std::vector<Node> rev_edges(cnt[n]);
-    for (int i = 0; i < n; i++) {
-        for (auto& e : g.get_edges(i)) {
-            rev_edges[--cnt[e.to]] = Node{i, {e.d_e, e.d_s}};
-        }
-    }
-
-#pragma omp parallel for schedule(dynamic)
-    for (int i = 0; i < n; i++) {
-        std::vector<Node> cands(rev_edges.begin() + cnt[i],
-                                rev_edges.begin() + cnt[i + 1]);
-        auto& edge = g.get_edges(i);
-        prune(edge, data_e, data_s, cands, max_edges);
     }
     return g;
 }
