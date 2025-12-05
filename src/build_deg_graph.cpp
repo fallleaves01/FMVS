@@ -45,13 +45,23 @@ Graph build_deg_graph(const VectorList& data_e,
         for (size_t j = i; j < std::min(i + Block, n); j++) {
             auto& edge = g.get_edges(j);
             prune(edge, data_e, data_s, cands[j - i], max_edges);
-            for (auto k : edge) {
-                // 反向边
-                auto& rev_edge = g.get_edges(k.to);
-                NodeUtils::Node rev_node{j, {k.d_e, k.d_s}};
-                std::vector<Node> rev_cand{rev_node};
-                prune(rev_edge, data_e, data_s, rev_cand, max_edges);
+        }
+
+        std::map<size_t, std::vector<Node>> rev_cands;
+        for (size_t j = i; j < std::min(i + Block, n); j++) {
+            for (auto k : g.get_edges(j)) {
+                rev_cands[k.to].push_back(
+                    Node{j, {k.d_e, k.d_s}});  // 收集反向边候选点
             }
+        }
+        std::vector<std::pair<size_t, std::vector<Node>>> rev_cands_vec(
+            rev_cands.begin(), rev_cands.end());
+#pragma omp parallel for schedule(dynamic)
+        for (size_t idx = 0; idx < rev_cands_vec.size(); idx++) {
+            size_t u = rev_cands_vec[idx].first;
+            auto& cand = rev_cands_vec[idx].second;
+            auto& edge = g.get_edges(u);
+            prune(edge, data_e, data_s, cand, max_edges);
         }
         if (i % 1000 == 0) {
             spdlog::info("{}/{} of spatial candidate search done", i + 1, n);
