@@ -20,20 +20,56 @@ Graph build_deg_graph(const VectorList& data_e,
     spdlog::info("Building FMVS graph with ef_build={}, max_edges={}", ef_build,
                  max_edges);
 
-    for (size_t i = 1; i < n; i++) {
-        std::vector<size_t> ins;
-        for (size_t j = 0; j < ef_build; j++) {
-            ins.push_back(get_thread_random_int(i - 1));
+    const size_t Block = 64;
+    for (size_t i = 0; i < n; i += Block) {
+        std::vector<std::vector<Node>> cands(std::min(Block, n - i));
+#pragma omp parallel for schedule(dynamic)
+        for (size_t j = i; j < std::min(i + Block, n); j++) {
+            std::vector<size_t> ins;
+            for (size_t k = i; k < std::min(i + Block, n); k++) {
+                if (k != j) {
+                    ins.push_back(k);
+                }
+            }
+            while (ins.size() < ef_build) {
+                ins.push_back(get_thread_random_int(i - 1));
+            }
+            std::ranges::sort(ins);
+            ins.erase(std::unique(ins.begin(), ins.end()), ins.end());
+            cands[j - i] =
+                pareto_search(g, j, data_e, data_s, ins, std::min(ef_build, j));
         }
-        std::ranges::sort(ins);
-        ins.erase(std::unique(ins.begin(), ins.end()), ins.end());
-        auto cand =
-            pareto_search(g, i, data_e, data_s, ins, std::min(ef_build, i));
-        auto& edge = g.get_edges(i);
-        prune(edge, data_e, data_s, cand, max_edges);
+#pragma omp parallel for schedule(dynamic)
+        for (size_t j = i; j < std::min(i + Block, n); j++) {
+            auto& edge = g.get_edges(j);
+            prune(edge, data_e, data_s, cands[j - i], max_edges);
+        }
         if (i % 1000 == 0) {
             spdlog::info("{}/{} of spatial candidate search done", i + 1, n);
         }
+    }
+    std::vector<size_t> cnt(n + 1);
+    for (int i = 0; i < n; i++) {
+        for (auto& e : g.get_edges(i)) {
+            cnt[e.to]++;
+        }
+    }
+    for (int i = 1; i <= n; i++) {
+        cnt[i] += cnt[i - 1];
+    }
+    std::vector<Node> rev_edges(cnt[n]);
+    for (int i = 0; i < n; i++) {
+        for (auto& e : g.get_edges(i)) {
+            rev_edges[--cnt[e.to]] = Node{i, {e.d_e, e.d_s}};
+        }
+    }
+
+#pragma omp parallel for schedule(dynamic)
+    for (int i = 0; i < n; i++) {
+        std::vector<Node> cands(rev_edges.begin() + cnt[i],
+                                rev_edges.begin() + cnt[i + 1]);
+        auto& edge = g.get_edges(i);
+        prune(edge, data_e, data_s, cands, max_edges);
     }
     return g;
 }
