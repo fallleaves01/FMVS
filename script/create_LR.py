@@ -58,4 +58,8 @@ python3 /home/liangsiyuan/FMVS/FMVS/script/create_LR.py \
 1000 \
 /mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/query_label.json
 
+python3 /home/liangsiyuan/FMVS/FMVS/script/create_LR.py \
+500000 \
+1000 \
+/mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data_src/query_label.json
 '''

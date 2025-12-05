@@ -91,4 +91,17 @@ python3 /home/liangsiyuan/FMVS/FMVS/script/split_fvecs.py \
 /mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/insert/total_vectors_addition.fvecs \
 /mnt/win-dai/liangsiyuan/FMVS/dataset/CC3M/data/insert/new_vectors_addition.fvecs \
 90000
+
+python3 /home/liangsiyuan/FMVS/FMVS/script/split_fvecs.py \
+/mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/insert/total_vectors.fvecs \
+/mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/insert/total_vectors_base.fvecs \
+/mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/insert/total_vectors_addition.fvecs \
+100000
+
+python3 /home/liangsiyuan/FMVS/FMVS/script/split_fvecs.py \
+/mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/insert/query_total.fvecs \
+/mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/insert/query_total_base.fvecs \
+/mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/insert/query_total_addition.fvecs \
+1000
+
 '''

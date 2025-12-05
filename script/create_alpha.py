@@ -37,4 +37,5 @@ if __name__ == "__main__":
 python3 /home/liangsiyuan/FMVS/FMVS/script/create_alpha.py \
 1000 \
 /mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/alpha.json
+
 '''

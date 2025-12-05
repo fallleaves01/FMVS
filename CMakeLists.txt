@@ -154,6 +154,7 @@ target_link_libraries(fmvs_common_config INTERFACE
 add_executable(fmvs_build
   src/build.cpp
   src/build_fmvs_graph.cpp
+  src/build_deg_graph.cpp
   ${HEADER_FILES}
 )
 

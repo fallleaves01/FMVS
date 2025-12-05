@@ -1,0 +1,12 @@
+{
+    "vector_file": "/mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/insert/total_vectors.fvecs",
+    "label_file": "/mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/insert/labels.json",
+    "graph_index": "/mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/index/insert/fmvs_graph.bin",
+    "headstone_file": "/mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/insert/headstone.json",
+    "beam_size": 150,
+    "alpha": "/mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/insert/alpha.json",
+    "k": 10,
+    "query_file": "/mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/insert/query_total.fvecs",
+    "query_label": "/mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/insert/query_label.json",
+    "debug_output": false
+}

@@ -18,8 +18,8 @@ Graph build_deg_graph(const VectorList& data_e,
                       size_t max_edges);
 
 std::vector<size_t> beam_search(const Graph& g,
-                                const std::vector<size_t>& labels,
-                                const std::array<size_t, 2>& intervals,
+                                // const std::vector<size_t>& labels,
+                                // const std::array<size_t, 2>& intervals,
                                 const std::vector<uint8_t>& valid_mask,
                                 const Eigen::VectorXf& q_e,
                                 const Eigen::VectorXf& q_s,
@@ -30,8 +30,9 @@ std::vector<size_t> beam_search(const Graph& g,
                                 size_t start_node,
                                 size_t beam_size);
 
-std::vector<size_t> linear_search(const std::vector<size_t>& labels,
-                                  const std::array<size_t, 2>& intervals,
+std::vector<size_t> linear_search(
+                                //   const std::vector<size_t>& labels,
+                                //   const std::array<size_t, 2>& intervals,
                                   const std::vector<uint8_t>& valid_mask,
                                   const Eigen::VectorXf& q_e,
                                   const Eigen::VectorXf& q_s,

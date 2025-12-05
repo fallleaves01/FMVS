@@ -1,0 +1,10 @@
+{
+  "vector_file": "/mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/delete/total_vectors.fvecs",
+  "output_file": "/mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/index/delete/fmvs_graph_2.bin",
+  "label_file": "/mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/delete/labels.json",
+  "headstone_file": "/mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/delete/headstone.json",
+  "ef_spatial": 250,
+  "ef_attribute": 250,
+  "max_edges": 250,
+  "debug_output": true
+}

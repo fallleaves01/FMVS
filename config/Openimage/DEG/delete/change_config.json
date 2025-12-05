@@ -1,0 +1,14 @@
+{
+    "old_vector_file": "/mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/delete/total_vectors.fvecs",
+    "new_vector_file": "",
+    "graph_file": "",
+    "old_label_file": "/mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/delete/labels.json",
+    "new_label_file": "",
+    "ef_spatial": 250,
+    "ef_attribute": 250,
+    "max_edges": 250,
+    "debug_output": true,
+    "headstone_file": "/mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/delete/headstone.json",
+    "delete_file": "/mnt/win-dai/liangsiyuan/FMVS/dataset/Openimage/data/delete/delete_file.json",
+    "id_flag": 2
+}
