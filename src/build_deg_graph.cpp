@@ -31,8 +31,10 @@ Graph build_deg_graph(const VectorList& data_e,
                     ins.push_back(k);
                 }
             }
-            while (ins.size() < ef_build) {
-                ins.push_back(get_thread_random_int(i - 1));
+            if (i > 0) {
+                while (ins.size() < ef_build) {
+                    ins.push_back(get_thread_random_int(i - 1));
+                }
             }
             std::ranges::sort(ins);
             ins.erase(std::unique(ins.begin(), ins.end()), ins.end());
